@@ -43,30 +43,26 @@ CHIP ALU {
 
     PARTS:
    // Put you code here:
-   
-   // 0 inputs
-   Mux16(a=x, b=false, sel=zx, out=x1);
-   Mux16(a=y, b=false, sel=zy, out=y1);
-   
-   //inputs
-   Not16(in=x1, out=notx1);
-   Not16(in=y1, out=noty1);
-   Mux16(a=x1, b=notx1, sel=nx, out=x2);
-   Mux16(a=y1, b=noty1, sel=ny, out=y2);
-   
-   //Function
-   Add16(a=x2, b=y2, out=addxy, over=ignore1);
-   And16(a=x2, b=y2, out=andxy);
-   Mux16(a=andxy, b=addxy, sel=f, out=fxy);
-   
-   // output
-   Not16(in=fxy, out=notfxy);
-   Mux16(a=fxy, b=notfxy, sel=no, out=out, out=finalout);
-   
-   //Status
-   And(a=finalout[15], b=true, out=ng);
-   Or8Way(in=finalout[0..7], out=or1);
-   Or8Way(in=finalout[8..15], out=or2);
-   Or(a=or1, b=or2, out=notzr);
-   Not(in=notzr, out=zr);
+    Mux16(a=x, b=false, sel=zx, out=xZero);   // zx=1 -> x=0
+    Not16(in=xZero, out=xNot);
+    Mux16(a=xZero, b=xNot, sel=nx, out=x1);   // nx=1 -> x=!x
+
+    Mux16(a=y, b=false, sel=zy, out=yZero);   // zy=1 -> y=0
+    Not16(in=yZero, out=yNot);
+    Mux16(a=yZero, b=yNot, sel=ny, out=y1);   // ny=1 -> y=!y
+
+    And16(a=x1, b=y1, out=andXY);
+    Add16(a=x1, b=y1, out=addXY);
+    Mux16(a=andXY, b=addXY, sel=f, out=out0);
+
+    Not16(in=out0, out=outNot);
+    Mux16(a=out0, b=outNot, sel=no, out=out);
+
+    Or8Way(in=out[0..7], out=orLow);
+    Or8Way(in=out[8..15], out=orHigh);
+    Or(a=orLow, b=orHigh, out=orAny);
+    Not(in=orAny, out=zr);
+
+
+    And(a=out[15], b=true, out=ng);
 }
