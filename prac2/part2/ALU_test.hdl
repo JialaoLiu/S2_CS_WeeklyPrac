@@ -1,0 +1,15 @@
+CHIP ALU {
+    IN  
+        x[16], y[16],
+        zx, nx, zy, ny, f, no;
+
+    OUT 
+        out[16],
+        zr, ng;
+
+    PARTS:
+    // Minimal test - just output x
+    Mux16(a=x, b=x, sel=false, out=out);
+    Or(a=false, b=false, out=zr);
+    Or(a=false, b=false, out=ng);
+}
